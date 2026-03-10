@@ -854,18 +854,17 @@ function confirmBooking() {
   bookingHistory.unshift(newBooking);
   localStorage.setItem('bookings', JSON.stringify(bookingHistory));
 
-  // Отправляем данные в бот
-  if (tg && tg.initData) {
-    tg.sendData(JSON.stringify({ action: 'book', ...newBooking }));
-} else {
-    console.log('Telegram WebApp не инициализирован, данные:', newBooking);
-    alert('Тест: ' + JSON.stringify(newBooking));
-}
+  // Отправляем данные в бота
+  try {
+    window.Telegram.WebApp.sendData(JSON.stringify({ action: 'book', ...newBooking }));
+  } catch(e) {
+    alert('Ошибка: ' + e.message);
+  }
+
   document.getElementById('booking-flow').style.display = 'none';
   document.getElementById('success-screen').classList.add('show');
   window.scrollTo(0, 0);
 }
-
 function resetBooking() {
   booking = { service: null, date: null, time: null, name: '', phone: '' };
   document.getElementById('booking-flow').style.display = 'block';
