@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Салон красоты</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF8F5;
+    --warm-white: #FFFFFF;
+    --stone: #9C9189;
+    --dark: #2C2825;
+    --accent: #C9A96E;
+    --accent-light: #F0E6D3;
+    --rose: #E8C5B8;
+    --border: #EDE8E1;
+    --shadow: 0 2px 20px rgba(44,40,37,0.08);
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--warm-white);
+    padding: 20px 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .salon-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--dark);
+  }
+
+  .salon-tagline {
+    font-size: 12px;
+    color: var(--stone);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .nav {
+    display: flex;
+    gap: 0;
+    margin-top: 16px;
+  }
+
+  .nav-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 10px 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--stone);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+    letter-spacing: 0.04em;
+  }
+
+  .nav-btn.active {
+    color: var(--dark);
+    font-weight: 500;
+  }
+
+  .nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px 2px 0 0;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 20px; animation: fadeIn 0.25s ease; }
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: var(--dark);
+  }
+
+  /* ── SERVICE CARDS ── */
+  .service-card {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .service-card:active { transform: scale(0.98); }
+
+  .service-card.selected {
+    border-color: var(--accent);
+    background: #FFFCF7;
+  }
+
+  .service-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--accent-light);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .service-info { flex: 1; }
+
+  .service-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--dark);
+  }
+
+  .service-meta {
+    font-size: 12px;
+    color: var(--stone);
+    margin-top: 3px;
+  }
+
+  .service-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  /* ── BOOKING FLOW ── */
+  .step-indicator {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .step-dot {
+    height: 3px;
+    flex: 1;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+
+  .step-dot.active { background: var(--accent); }
+  .step-dot.done { background: var(--accent); opacity: 0.4; }
+
+  .step-label {
+    font-size: 11px;
+    color: var(--stone);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* ── DATE GRID ── */
+  .date-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .date-btn {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 4px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .date-btn:active { transform: scale(0.96); }
+
+  .date-btn.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .date-day {
+    font-size: 18px;
+    font-weight: 500;
+    display: block;
+  }
+
+  .date-weekday {
+    font-size: 10px;
+    color: var(--stone);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 1px;
+  }
+
+  .date-btn.selected .date-weekday { color: rgba(255,255,255,0.8); }
+
+  /* ── TIME SLOTS ── */
+  .time-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .time-btn {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .time-btn:active { transform: scale(0.96); }
+  .time-btn.selected { background: var(--accent); border-color: var(--accent); color: white; }
+  .time-btn.busy { opacity: 0.35; cursor: not-allowed; background: var(--border); }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 14px; }
+
+  .form-label {
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--dark);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus { border-color: var(--accent); }
+
+  /* ── CONFIRM CARD ── */
+  .confirm-card {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .confirm-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .confirm-row:last-child { border-bottom: none; }
+  .confirm-row-label { color: var(--stone); }
+  .confirm-row-value { font-weight: 500; color: var(--dark); }
+
+  /* ── BUTTON ── */
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-secondary {
+    width: 100%;
+    background: var(--accent-light);
+    color: var(--dark);
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: opacity 0.2s;
+  }
+
+  /* ── BOOKING HISTORY ── */
+  .booking-card {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .booking-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .booking-service {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .booking-meta {
+    font-size: 13px;
+    color: var(--stone);
+    display: flex;
+    gap: 12px;
+  }
+
+  .booking-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 8px;
+  }
+
+  .status-upcoming { background: #E8F5E9; color: #388E3C; }
+  .status-done { background: var(--border); color: var(--stone); }
+
+  /* ── CONTACTS ── */
+  .contact-card {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .contact-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--accent-light);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .contact-label { font-size: 11px; color: var(--stone); text-transform: uppercase; letter-spacing: 0.06em; }
+  .contact-value { font-size: 15px; font-weight: 500; margin-top: 2px; }
+
+  .map-placeholder {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--stone);
+    font-size: 13px;
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* ── SUCCESS ── */
+  .success-screen {
+    text-align: center;
+    padding: 40px 20px;
+    display: none;
+  }
+
+  .success-screen.show { display: block; }
+
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--accent-light), var(--rose));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 20px;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  .success-sub {
+    font-size: 14px;
+    color: var(--stone);
+    line-height: 1.6;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--stone);
+  }
+
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="salon-name">Beauté Studio</div>
+  <div class="salon-tagline">Салон красоты • Казань</div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showPage('services')">Услуги</button>
+    <button class="nav-btn" onclick="showPage('booking')">Запись</button>
+    <button class="nav-btn" onclick="showPage('history')">Мои записи</button>
+    <button class="nav-btn" onclick="showPage('contacts')">Контакты</button>
+  </nav>
+</div>
+
+<!-- ══ УСЛУГИ ══ -->
+<div id="page-services" class="page active">
+  <p class="section-title">Наши услуги</p>
+  <div id="services-list"></div>
+</div>
+
+<!-- ══ ЗАПИСЬ ══ -->
+<div id="page-booking" class="page">
+  <div id="booking-flow">
+    <!-- Шаг 1: Услуга -->
+    <div id="step-service">
+      <div class="step-indicator">
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="step-label">Шаг 1 из 4 — Услуга</div>
+      <p class="section-title">Выберите услугу</p>
+      <div id="booking-services-list"></div>
+    </div>
+
+    <!-- Шаг 2: Дата и время -->
+    <div id="step-datetime" style="display:none">
+      <div class="step-indicator">
+        <div class="step-dot done"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="step-label">Шаг 2 из 4 — Дата и время</div>
+      <p class="section-title">Выберите дату</p>
+      <div class="date-grid" id="date-grid"></div>
+      <p class="section-title" style="margin-top:4px">Выберите время</p>
+      <div class="time-grid" id="time-grid"></div>
+      <button class="btn-primary" id="btn-next-datetime" onclick="goToStep3()" disabled>Продолжить</button>
+      <button class="btn-secondary" onclick="goToStep(1)">← Назад</button>
+    </div>
+
+    <!-- Шаг 3: Контактные данные -->
+    <div id="step-contacts" style="display:none">
+      <div class="step-indicator">
+        <div class="step-dot done"></div>
+        <div class="step-dot done"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="step-label">Шаг 3 из 4 — Ваши данные</div>
+      <p class="section-title">Контактные данные</p>
+      <div class="form-group">
+        <label class="form-label">Ваше имя</label>
+        <input class="form-input" id="input-name" type="text" placeholder="Анна Иванова">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Номер телефона</label>
+        <input class="form-input" id="input-phone" type="tel" placeholder="+7 (999) 000-00-00">
+      </div>
+      <button class="btn-primary" onclick="goToConfirm()">Продолжить</button>
+      <button class="btn-secondary" onclick="goToStep(2)">← Назад</button>
+    </div>
+
+    <!-- Шаг 4: Подтверждение -->
+    <div id="step-confirm" style="display:none">
+      <div class="step-indicator">
+        <div class="step-dot done"></div>
+        <div class="step-dot done"></div>
+        <div class="step-dot done"></div>
+        <div class="step-dot active"></div>
+      </div>
+      <div class="step-label">Шаг 4 из 4 — Подтверждение</div>
+      <p class="section-title">Проверьте запись</p>
+      <div class="confirm-card">
+        <div class="confirm-row">
+          <span class="confirm-row-label">Услуга</span>
+          <span class="confirm-row-value" id="conf-service">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Цена</span>
+          <span class="confirm-row-value" id="conf-price">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Дата</span>
+          <span class="confirm-row-value" id="conf-date">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Время</span>
+          <span class="confirm-row-value" id="conf-time">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Имя</span>
+          <span class="confirm-row-value" id="conf-name">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Телефон</span>
+          <span class="confirm-row-value" id="conf-phone">—</span>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="confirmBooking()">✓ Подтвердить запись</button>
+      <button class="btn-secondary" onclick="goToStep(3)">← Назад</button>
+    </div>
+  </div>
+
+  <!-- Успех -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">✨</div>
+    <div class="success-title">Запись подтверждена!</div>
+    <p class="success-sub">Ждём вас в назначенное время.<br>За день до визита придёт напоминание.</p>
+    <button class="btn-primary" style="margin-top:32px" onclick="resetBooking()">Записаться ещё раз</button>
+  </div>
+</div>
+
+<!-- ══ МОИ ЗАПИСИ ══ -->
+<div id="page-history" class="page">
+  <p class="section-title">Мои записи</p>
+  <div id="history-list"></div>
+</div>
+
+<!-- ══ КОНТАКТЫ ══ -->
+<div id="page-contacts" class="page">
+  <p class="section-title">Контакты</p>
+  <div class="contact-card">
+    <div class="contact-icon">📍</div>
+    <div>
+      <div class="contact-label">Адрес</div>
+      <div class="contact-value">ул. Баумана, д. 12</div>
+    </div>
+  </div>
+  <div class="contact-card">
+    <div class="contact-icon">📱</div>
+    <div>
+      <div class="contact-label">Телефон</div>
+      <div class="contact-value">+7 (843) 000-00-00</div>
+    </div>
+  </div>
+  <div class="contact-card">
+    <div class="contact-icon">🕐</div>
+    <div>
+      <div class="contact-label">Режим работы</div>
+      <div class="contact-value">Пн–Вс: 9:00 — 20:00</div>
+    </div>
+  </div>
+  <div class="contact-card">
+    <div class="contact-icon">✉️</div>
+    <div>
+      <div class="contact-label">Instagram</div>
+      <div class="contact-value">@beaute_kazan</div>
+    </div>
+  </div>
+  <div class="map-placeholder">
+    <span style="font-size:28px">🗺</span>
+    <span>Карта откроется после настройки адреса</span>
+  </div>
+</div>
+
+<script>
+// ══ ДАННЫЕ (загружаются с бэкенда) ══
+const SERVICES = [
+  { id: 1, name: "Стрижка и укладка", price: 1500, duration: 60, icon: "✂️" },
+  { id: 2, name: "Окрашивание волос", price: 4500, duration: 120, icon: "🎨" },
+  { id: 3, name: "Маникюр", price: 1200, duration: 60, icon: "💅" },
+  { id: 4, name: "Педикюр", price: 1400, duration: 75, icon: "✨" },
+  { id: 5, name: "Брови и ресницы", price: 800, duration: 45, icon: "👁️" },
+  { id: 6, name: "Уход за лицом", price: 2500, duration: 90, icon: "🌿" },
+];
+
+const SLOTS = {
+  "2025-03-12": ["10:00","11:00","14:00","15:00","17:00"],
+  "2025-03-13": ["09:00","10:00","11:00","13:00","16:00"],
+  "2025-03-14": ["12:00","14:00","15:00","18:00"],
+  "2025-03-15": ["10:00","11:00","13:00","14:00","15:00","16:00"],
+  "2025-03-17": ["09:00","10:00","14:00","17:00"],
+  "2025-03-18": ["11:00","13:00","15:00","16:00","18:00"],
+  "2025-03-19": ["10:00","12:00","14:00"],
+  "2025-03-20": ["09:00","10:00","11:00","13:00","14:00","15:00"],
+};
+
+// Состояние записи
+let booking = { service: null, date: null, time: null, name: '', phone: '' };
+let bookingHistory = JSON.parse(localStorage.getItem('bookings') || '[]');
+
+// ══ ИНИЦИАЛИЗАЦИЯ ══
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  // Предзаполнение имени из Telegram
+  if (tg.initDataUnsafe?.user) {
+    const u = tg.initDataUnsafe.user;
+    document.getElementById('input-name').value = [u.first_name, u.last_name].filter(Boolean).join(' ');
+  }
+}
+
+// ══ НАВИГАЦИЯ ══
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.target.classList.add('active');
+
+  if (name === 'history') renderHistory();
+}
+
+// ══ РЕНДЕР УСЛУГ ══
+function renderServices() {
+  const list = document.getElementById('services-list');
+  const bookList = document.getElementById('booking-services-list');
+  list.innerHTML = '';
+  bookList.innerHTML = '';
+
+  SERVICES.forEach(s => {
+    const card = `
+      <div class="service-card" onclick="selectServiceForBooking(${s.id})">
+        <div class="service-icon">${s.icon}</div>
+        <div class="service-info">
+          <div class="service-name">${s.name}</div>
+          <div class="service-meta">${s.duration} мин</div>
+        </div>
+        <div class="service-price">${s.price.toLocaleString()} ₽</div>
+      </div>`;
+
+    const infoCard = `
+      <div class="service-card">
+        <div class="service-icon">${s.icon}</div>
+        <div class="service-info">
+          <div class="service-name">${s.name}</div>
+          <div class="service-meta">${s.duration} мин</div>
+        </div>
+        <div class="service-price">${s.price.toLocaleString()} ₽</div>
+      </div>`;
+
+    list.innerHTML += infoCard;
+
+    const bookCard = document.createElement('div');
+    bookCard.className = 'service-card';
+    bookCard.id = `book-svc-${s.id}`;
+    bookCard.innerHTML = `
+      <div class="service-icon">${s.icon}</div>
+      <div class="service-info">
+        <div class="service-name">${s.name}</div>
+        <div class="service-meta">${s.duration} мин</div>
+      </div>
+      <div class="service-price">${s.price.toLocaleString()} ₽</div>`;
+    bookCard.onclick = () => selectServiceForBooking(s.id);
+    bookList.appendChild(bookCard);
+  });
+}
+
+// ══ ВЫБОР УСЛУГИ ══
+function selectServiceForBooking(id) {
+  booking.service = SERVICES.find(s => s.id === id);
+  document.querySelectorAll('#booking-services-list .service-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById(`book-svc-${id}`).classList.add('selected');
+  setTimeout(() => goToStep(2), 200);
+}
+
+// ══ ШАГ 2: Дата и время ══
+function goToStep(n) {
+  document.getElementById('step-service').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('step-datetime').style.display = n === 2 ? 'block' : 'none';
+  document.getElementById('step-contacts').style.display = n === 3 ? 'block' : 'none';
+  document.getElementById('step-confirm').style.display = n === 4 ? 'block' : 'none';
+
+  if (n === 2) renderDates();
+  window.scrollTo(0, 0);
+}
+
+function renderDates() {
+  const grid = document.getElementById('date-grid');
+  grid.innerHTML = '';
+  booking.date = null;
+  booking.time = null;
+  document.getElementById('btn-next-datetime').disabled = true;
+
+  const weekdays = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  const months = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+
+  Object.keys(SLOTS).sort().forEach(dateStr => {
+    const d = new Date(dateStr);
+    const btn = document.createElement('div');
+    btn.className = 'date-btn';
+    btn.innerHTML = `<span class="date-day">${d.getDate()} ${months[d.getMonth()]}</span><span class="date-weekday">${weekdays[d.getDay()]}</span>`;
+    btn.onclick = () => selectDate(dateStr, btn);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('time-grid').innerHTML = '<div style="grid-column:1/-1;color:var(--stone);font-size:13px;padding:8px 0">← Сначала выберите дату</div>';
+}
+
+function selectDate(dateStr, el) {
+  booking.date = dateStr;
+  booking.time = null;
+  document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  renderTimes(dateStr);
+  document.getElementById('btn-next-datetime').disabled = true;
+}
+
+function renderTimes(dateStr) {
+  const grid = document.getElementById('time-grid');
+  grid.innerHTML = '';
+  const times = SLOTS[dateStr] || [];
+  times.forEach(t => {
+    const btn = document.createElement('div');
+    btn.className = 'time-btn';
+    btn.textContent = t;
+    btn.onclick = () => selectTime(t, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function selectTime(time, el) {
+  booking.time = time;
+  document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-next-datetime').disabled = false;
+}
+
+function goToStep3() {
+  if (!booking.date || !booking.time) return;
+  goToStep(3);
+}
+
+// ══ ШАГ 4: Подтверждение ══
+function goToConfirm() {
+  const name = document.getElementById('input-name').value.trim();
+  const phone = document.getElementById('input-phone').value.trim();
+  if (!name || !phone) {
+    alert('Пожалуйста, заполните все поля');
+    return;
+  }
+  booking.name = name;
+  booking.phone = phone;
+
+  const d = new Date(booking.date);
+  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  const prettyDate = `${d.getDate()} ${months[d.getMonth()]}`;
+
+  document.getElementById('conf-service').textContent = booking.service.name;
+  document.getElementById('conf-price').textContent = booking.service.price.toLocaleString() + ' ₽';
+  document.getElementById('conf-date').textContent = prettyDate;
+  document.getElementById('conf-time').textContent = booking.time;
+  document.getElementById('conf-name').textContent = booking.name;
+  document.getElementById('conf-phone').textContent = booking.phone;
+
+  goToStep(4);
+}
+
+// ══ ПОДТВЕРЖДЕНИЕ ЗАПИСИ ══
+function confirmBooking() {
+  const newBooking = {
+    id: Date.now(),
+    service: booking.service.name,
+    price: booking.service.price,
+    date: booking.date,
+    time: booking.time,
+    name: booking.name,
+    phone: booking.phone,
+  };
+
+  bookingHistory.unshift(newBooking);
+  localStorage.setItem('bookings', JSON.stringify(bookingHistory));
+
+  // Отправляем данные в бот
+  if (tg) {
+    tg.sendData(JSON.stringify({ action: 'book', ...newBooking }));
+  }
+
+  document.getElementById('booking-flow').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+function resetBooking() {
+  booking = { service: null, date: null, time: null, name: '', phone: '' };
+  document.getElementById('booking-flow').style.display = 'block';
+  document.getElementById('success-screen').classList.remove('show');
+  goToStep(1);
+}
+
+// ══ ИСТОРИЯ ЗАПИСЕЙ ══
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (bookingHistory.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">У вас пока нет записей.<br>Запишитесь на услугу прямо сейчас!</div></div>`;
+    return;
+  }
+
+  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  list.innerHTML = bookingHistory.map(b => {
+    const d = new Date(b.date);
+    const prettyDate = `${d.getDate()} ${months[d.getMonth()]}`;
+    const isUpcoming = new Date(b.date) >= new Date();
+    return `
+      <div class="booking-card">
+        <div class="booking-service">${b.service}</div>
+        <div class="booking-meta">
+          <span>📅 ${prettyDate}</span>
+          <span>🕐 ${b.time}</span>
+          <span>💰 ${b.price.toLocaleString()} ₽</span>
+        </div>
+        <span class="booking-status ${isUpcoming ? 'status-upcoming' : 'status-done'}">${isUpcoming ? 'Предстоит' : 'Завершена'}</span>
+      </div>`;
+  }).join('');
+}
+
+// ══ ЗАПУСК ══
+renderServices();
+</script>
+</body>
+</html>
