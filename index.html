@@ -855,10 +855,12 @@ function confirmBooking() {
   localStorage.setItem('bookings', JSON.stringify(bookingHistory));
 
   // Отправляем данные в бот
-  if (tg) {
+  if (tg && tg.initData) {
     tg.sendData(JSON.stringify({ action: 'book', ...newBooking }));
-  }
-
+} else {
+    console.log('Telegram WebApp не инициализирован, данные:', newBooking);
+    alert('Тест: ' + JSON.stringify(newBooking));
+}
   document.getElementById('booking-flow').style.display = 'none';
   document.getElementById('success-screen').classList.add('show');
   window.scrollTo(0, 0);
